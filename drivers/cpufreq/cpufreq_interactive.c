@@ -353,7 +353,7 @@ static u64 update_load(int cpu)
 	struct cpufreq_loadinfo *cur_loadinfo = &per_cpu(loadinfo, cpu);
 #endif
 
-	now_idle = get_cpu_idle_time(cpu, &now);
+	now_idle = get_cpu_idle_time(cpu, &now, 0);
 	delta_idle = (unsigned int)(now_idle - pcpu->time_in_idle);
 	delta_time = (unsigned int)(now - pcpu->time_in_idle_timestamp);
 
@@ -989,6 +989,7 @@ static ssize_t show_target_loads(
 	for (i = 0; i < ntarget_loads; i++)
 		ret += sprintf(buf + ret, "%u%s", target_loads[i],
 			       i & 0x1 ? ":" : " ");
+#endif
 
 	sprintf(buf + ret - 1, "\n");
 	spin_unlock_irqrestore(&target_loads_lock, flags);
@@ -1585,7 +1586,7 @@ static void cpufreq_param_set_init(void)
 		timer_rate_set[i] = timer_rate;
 		above_hispeed_delay_set[i] = above_hispeed_delay;
 		nabove_hispeed_delay_set[i] = nabove_hispeed_delay;
-		sampling_down_factor_set[i] = sampling_down_factor;
+		sampling_down_factor_set[i] = max_freq_hysteresis;
 	}
 	spin_unlock_irqrestore(&mode_lock, flags);
 }
